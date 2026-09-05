@@ -698,7 +698,7 @@
           <div class="stat-desc">获得积分</div>
         </div>
       </div>
-      <div style="text-align:center;margin-top:12px;font-size:13px;color:#aaa;">100积分 = 1次一对一答疑服务</div>
+      <div style="text-align:center;margin-top:12px;font-size:13px;color:#aaa;" id="pointsTip">100积分 = 1次一对一答疑服务（B站私信「考公人tjmtkn」兑换）</div>
 
       <button class="btn btn-primary" onclick="restart()">再来一轮 🔄</button>
 
@@ -1410,6 +1410,89 @@ const questions = [
       { tag: '锁定C ✅', text: 'C<span class="kw">"因噎废食"</span>——害怕噎到就不吃食物了，完美对应"不能因为安全风险就不做运动"。<span class="kw">选C</span>。' },
       { tag: '排除D验证', text: '<span class="kw">"委曲求全"</span>——委屈自己来求一个完全，这里没有"全"的意思，排除。' }
     ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '城镇化发展不宜<span class="blank">①</span>。城镇化率低且人口规模大的地区，应着重提升水平、挖掘潜力；城镇化率较高且人口持续集聚的地区，不妨促进大中小城市和小城镇<span class="blank">②</span>发展。在此过程中，要坚持系统观念，统筹城乡、双向发力。如此，才能在城乡一体、良性互动中，让城镇化成为一个顺势而为、<span class="blank">③</span>的发展过程。',
+    options: [
+      { label: 'A', words: ['一步到位', '共同', '自然而然'] },
+      { label: 'B', words: ['一哄而上', '均衡', '顺理成章'] },
+      { label: 'C', words: ['千篇一律', '融合', '大势所趋'] },
+      { label: 'D', words: ['整齐划一', '协调', '水到渠成'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '往后读，后面是解释：<span class="kw">城镇化率低且人口规模大的地区</span>一个做法，<span class="kw">城镇化率高且人口聚集的地区</span>另一个做法。两种情况两种做法，证明我们<span class="kw">不能按同一套策略来</span>。' },
+      { tag: '排除A、B', text: '<span class="kw">一步到位、一哄而上</span>，跟"不能同一套策略"这个意思没有关系，排除。' },
+      { tag: '第一空锁定C、D', text: '<span class="kw">千篇一律</span>和<span class="kw">整齐划一</span>都有"都一个样"的意思，可以。' },
+      { tag: '第二空排除C', text: '促进大中小城市和小城镇什么发展？<span class="kw">融合</span>不太对——前面都说了不能整齐划一，你"融合"那不就大家融在一块了吗？不是的。<span class="kw">协调</span>才是可以的，各自发展又互相配合。' },
+      { tag: '选D ✅', text: '<span class="kw">整齐划一</span>（不能一个样）→<span class="kw">协调</span>发展→<span class="kw">水到渠成</span>（顺势而为，条件成熟自然成），<span class="kw">选D</span>。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 单空',
+    text: '党员干部生活作风的蜕变，往往是从吃喝等看似小事的地方开始的。"堤溃蚁孔，气泄针芒"，这句古训就是强调<span class="blank">①</span>的重要性。习近平同志曾在《之江新语》中写道："小事小节是一面镜子，能够反映人品，反映作风。"党员干部要严格对照中央八项规定精神，深刻认识小与大的辩证关系，主动"照镜子"自查。',
+    options: [
+      { label: 'A', words: ['防微杜渐'], correct: true },
+      { label: 'B', words: ['积微成著'] },
+      { label: 'C', words: ['谨小慎微'] },
+      { label: 'D', words: ['曲突徙薪'] }
+    ],
+    analysis: [
+      { tag: '语境', text: '"堤溃蚁孔，气泄针芒"这句古训在强调什么？<span class="kw">就是强调小事</span>——堤坝因为蚂蚁洞溃掉，气从针芒大的小孔泄掉。' },
+      { tag: '排除D', text: '<span class="kw">曲突徙薪</span>——提前把烟囱改弯、把柴草移走防火灾，跟"小事"没有直接关系，排除。' },
+      { tag: '排除B', text: '<span class="kw">积微成著</span>——积累小的事情成为大的事情。题干强调的<span class="kw">不是"积累"</span>，而是很多错误从小的地方开始，慢慢变大变坏。排除。' },
+      { tag: 'A vs C', text: '<span class="kw">谨小慎微</span>是谨慎小的；<span class="kw">防微杜渐</span>是防止小的慢慢变成更严重的。题干不是单纯说要谨慎，而是<span class="kw">防止小的变成更大的</span>。' },
+      { tag: '选A ✅', text: '"从吃喝等看似小事的地方开始，然后慢慢变大"，堤溃蚁孔、气泄针芒都是一样的——<span class="kw">小问题不防就会形成更不好的结果</span>。<span class="kw">选A 防微杜渐</span>。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '作为一种求助手段，大病网络众筹发挥了互联网快速、灵活、高效的特点，解了一些困难家庭的<span class="blank">①</span>，给患者带来了希望，不失为社会医疗保障之外的有益补充。但是，平台对善款的抽成也广受<span class="blank">②</span>，最近又有媒体报道，除了平台之外，部分工作人员也在协助筹集善款的过程中抽取佣金，再次引发了网民对众筹平台的信任危机。',
+    options: [
+      { label: 'A', words: ['燃眉之急', '诟病'], correct: true },
+      { label: 'B', words: ['当务之急', '争议'] },
+      { label: 'C', words: ['不时之需', '责难'] },
+      { label: 'D', words: ['无米之炊', '非议'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '大病网络众筹一般是<span class="kw">比较紧急的事</span>。<span class="kw">燃眉之急</span>可以，<span class="kw">当务之急</span>也可以。' },
+      { tag: '排除C、D', text: '<span class="kw">不时之需</span>——不定什么时候的需要，题干没有这个意思；<span class="kw">无米之炊</span>——没有米做不了饭，跟这没关系。排除。' },
+      { tag: '第二空·A vs B', text: '平台对善款的抽成广受什么？<span class="kw">争议</span>不太行——争议是<span class="kw">有好的有坏的</span>才叫争议。这道题对抽成<span class="kw">只有坏的评价</span>，所以不选争议。' },
+      { tag: '选A ✅', text: '<span class="kw">诟病</span>——就是指责、骂，正好对应"只有坏的"。<span class="kw">选A</span>（燃眉之急／诟病）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '利用网络存在的安全漏洞入网窃取数据信息，这种方式相当隐蔽，往往会使数据的安全响应<span class="blank">①</span>；而且网络中流转数据的规模十分巨大，来源异常复杂，攻击者一旦掌握网络漏洞，入侵网络后就可以在网上"<span class="blank">②</span>"，窃取数据。因此，必须严密防范数据在共享过程中可能遭受的各种攻击和泄露。',
+    options: [
+      { label: 'A', words: ['防不胜防', '按图索骥'] },
+      { label: 'B', words: ['形同虚设', '守株待兔'], correct: true },
+      { label: 'C', words: ['名存实亡', '偷天换日'] },
+      { label: 'D', words: ['鞭长莫及', '瓮中捉鳖'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '方式相当隐蔽，往往使数据的安全响应……<span class="kw">就是没有响应了那个意思</span>。' },
+      { tag: '排除D', text: '<span class="kw">鞭长莫及</span>——鞭子很长但还是达不到，证明的是<span class="kw">实力有问题</span>。但题干不是实力有问题，是系统防范还不够严密、需要完善，所以D不对。' },
+      { tag: '第二空排除A、C', text: '数据规模巨大、来源复杂，攻击者就不可能<span class="kw">按图索骥</span>（按线索去找）；<span class="kw">偷天换日</span>是偷换的意思（天和日），也不符合。' },
+      { tag: '选B ✅', text: '安全响应<span class="kw">形同虚设</span>——可以；攻击者入侵网络后就可以在网上<span class="kw">守株待兔</span>——我进到网络里了，就在里面等着数据来，然后窃取。<span class="kw">选B</span>。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '蹭知名企业，注册相似的名称博人气、抓流量，达到<span class="blank">①</span>的效果……在商业竞争日益激烈的今天，一些不良商家走上"歪门邪道"，通过商业碰瓷来谋取不正当利益。这种"搭便车"的歪风邪气如任其长期存在，将衍化成为严重破坏市场生态的毒瘤，不仅让消费者真假难辨，而且<span class="blank">②</span>企业的创新动力和消费者的信任基础。',
+    options: [
+      { label: 'A', words: ['鱼龙混杂', '蚕食'] },
+      { label: 'B', words: ['滥竽充数', '危害'] },
+      { label: 'C', words: ['鱼目混珠', '侵蚀'], correct: true },
+      { label: 'D', words: ['掩人耳目', '削弱'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '注册和知名企业<span class="kw">相似的名称</span>，让大家弄混，然后提升自己流量。' },
+      { tag: '锁定C', text: '<span class="kw">鱼目混珠</span>——用鱼的眼睛和珠子混在一起，让大家弄混两个东西，不知哪个真哪个假。对应题干：<span class="kw">一个真的知名企业，一个他蹭的</span>，非常符合。' },
+      { tag: '排除D', text: '<span class="kw">掩人耳目</span>——他并没有让大家不知道真相，而是大家把他<span class="kw">弄混了</span>。他注册的蹭知名企业的公司是真实存在的，没让大家不知道这事，只是大家不能分辨他。不太符合。' },
+      { tag: '排除A、B', text: '<span class="kw">鱼龙混杂</span>和<span class="kw">滥竽充数</span>倾向的是<span class="kw">好坏</span>——鱼龙混杂是好坏混在一起。但题干不是好坏混在一起，而是用这个东西让大家<span class="kw">弄混真假</span>，跟好坏没关系。' },
+      { tag: '第二空验证 ✅', text: '"让消费者<span class="kw">真假难辨</span>"——题干一直强调<span class="kw">真假</span>，没强调好坏；"<span class="kw">侵蚀</span>企业的创新动力和消费者的信任基础"，可以。<span class="kw">选C</span>。' }
+    ]
   }
 ];
 
@@ -1525,6 +1608,12 @@ function submitAnswer() {
   }
 
   analysis.classList.add('show');
+  if(!correct) {
+    const hint = document.createElement('div');
+    hint.style.cssText = 'margin:10px 0 2px;padding:10px 14px;background:#fff7ed;border:1px dashed #f59e0b;border-radius:10px;font-size:13px;color:#92400e;line-height:1.7;';
+    hint.innerHTML = '💬 这题还是没搞懂？攒够100积分（约20题）可在B站私信「考公人tjmtkn」兑换1次一对一讲题；想立刻弄懂也可以直接私信发题目截图，19.9元/次。';
+    analysis.parentNode.insertBefore(hint, analysis.nextSibling);
+  }
   submitBtn.classList.add('hidden');
   if(nextBtn) nextBtn.style.display = 'block';
 
@@ -1647,6 +1736,10 @@ function showResult() {
   document.getElementById('correctCount').textContent = score;
   document.getElementById('wrongCount').textContent = totalThisRound - score;
   document.getElementById('totalPoints').textContent = points;
+  const pt = document.getElementById('pointsTip');
+  if(pt) pt.innerHTML = points >= 100
+    ? '🎁 积分已够100！现在就去B站私信「考公人tjmtkn」兑换1次一对一讲题'
+    : `再攒 ${100 - points} 积分（约${Math.ceil((100-points)/5)}道对题）即可兑换1次一对一讲题；急着弄懂可直接私信，19.9元/次`;
 
   document.getElementById('quizArea').classList.add('hidden');
   document.querySelector('.progress-wrap').classList.add('hidden');
