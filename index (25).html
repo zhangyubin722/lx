@@ -1,0 +1,1704 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>语境呼应法 · 逻辑填空修炼场</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0f0f1a;
+    min-height: 100vh;
+    color: #fff;
+    overflow-x: hidden;
+  }
+
+  /* 星空背景 */
+  .stars {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(ellipse at top, #1a1a3e 0%, #0f0f1a 50%, #0a0a14 100%);
+    z-index: 0;
+  }
+  .star {
+    position: absolute;
+    width: 2px; height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 3s infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+    min-height: 100vh;
+  }
+
+  /* 顶栏 */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .points {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(251,191,36,0.3);
+  }
+  .points-icon { font-size: 16px; }
+  .streak {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.1);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  /* 标题区 */
+  .hero {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: 22px;
+    background: linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  .hero p {
+    font-size: 13px;
+    color: #999;
+  }
+
+  /* 进度条 */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .progress-bar {
+    flex: 1;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    background: linear-gradient(90deg, #a78bfa, #60a5fa);
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .progress-text {
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+  }
+
+  /* 题目卡片 */
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 24px 20px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 16px;
+  }
+  .question-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #818cf8, #6366f1);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+  .question-text {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #e0e0e0;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 50px;
+    border-bottom: 2px solid #818cf8;
+    text-align: center;
+    color: #a78bfa;
+    font-weight: bold;
+    margin: 0 2px;
+  }
+
+  /* 选项 */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .option {
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-size: 15px;
+  }
+  .option:active { transform: scale(0.98); }
+  .option:hover { border-color: rgba(129,140,248,0.5); background: rgba(129,140,248,0.08); }
+  .option.selected {
+    border-color: #818cf8;
+    background: rgba(129,140,248,0.15);
+    box-shadow: 0 0 20px rgba(129,140,248,0.2);
+  }
+  .option.correct {
+    border-color: #10b981;
+    background: rgba(16,185,129,0.15);
+    box-shadow: 0 0 20px rgba(16,185,129,0.2);
+    animation: pop 0.4s ease;
+  }
+  .option.wrong {
+    border-color: #ef4444;
+    background: rgba(239,68,68,0.15);
+    animation: shake 0.4s ease;
+  }
+  .option.disabled { cursor: default; pointer-events: none; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  .option-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .option.selected .option-label { background: #818cf8; }
+  .option.correct .option-label { background: #10b981; }
+  .option.wrong .option-label { background: #ef4444; }
+  .option-words {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .word-chip {
+    background: rgba(255,255,255,0.06);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  /* 按钮 */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 16px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: linear-gradient(135deg, #818cf8, #6366f1);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+  }
+  .btn-primary:disabled {
+    background: rgba(255,255,255,0.1);
+    box-shadow: none;
+    color: #555;
+    cursor: not-allowed;
+  }
+  .btn-next {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+  }
+
+  /* 反馈弹层 */
+  .feedback {
+    margin-top: 16px;
+    padding: 20px;
+    border-radius: 16px;
+    text-align: center;
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+  .feedback.show { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .feedback.correct-fb {
+    background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(5,150,105,0.1));
+    border: 1px solid rgba(16,185,129,0.3);
+  }
+  .feedback.wrong-fb {
+    background: linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.08));
+    border: 1px solid rgba(251,191,36,0.3);
+  }
+  .feedback-emoji {
+    font-size: 36px;
+    margin-bottom: 8px;
+  }
+  .feedback-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .feedback.correct-fb .feedback-title { color: #34d399; }
+  .feedback.wrong-fb .feedback-title { color: #fbbf24; }
+  .feedback-msg {
+    font-size: 14px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+  .feedback-points {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 10px;
+    background: rgba(251,191,36,0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #fbbf24;
+    font-weight: bold;
+  }
+
+  /* 解析 */
+  .analysis {
+    margin-top: 16px;
+    padding: 18px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    border-left: 3px solid #818cf8;
+    display: none;
+  }
+  .analysis.show { display: block; animation: fadeUp 0.4s ease; }
+  .analysis-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #a78bfa;
+    margin-bottom: 12px;
+  }
+  .analysis-step {
+    margin-bottom: 10px;
+    line-height: 1.7;
+    font-size: 14px;
+    color: #ccc;
+  }
+  .step-tag {
+    display: inline-block;
+    background: rgba(129,140,248,0.2);
+    color: #a78bfa;
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  .kw { color: #fbbf24; font-weight: bold; }
+  .strike { text-decoration: line-through; color: #666; }
+
+  /* 结果页 */
+  .result-card {
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .result-emoji { font-size: 60px; margin-bottom: 16px; }
+  .result-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  .result-subtitle {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+  .result-score-box {
+    background: linear-gradient(135deg, rgba(129,140,248,0.15), rgba(99,102,241,0.1));
+    border: 1px solid rgba(129,140,248,0.3);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .score-big {
+    font-size: 56px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .score-label { font-size: 14px; color: #888; }
+  .result-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: bold; }
+  .stat-num.green { color: #34d399; }
+  .stat-num.red { color: #f87171; }
+  .stat-num.gold { color: #fbbf24; }
+  .stat-desc { font-size: 12px; color: #777; margin-top: 2px; }
+
+  /* 底部引导 */
+  .bottom-cta {
+    background: linear-gradient(135deg, rgba(129,140,248,0.12), rgba(96,165,250,0.08));
+    border: 1px solid rgba(129,140,248,0.25);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 16px;
+  }
+  .bottom-cta h3 {
+    font-size: 16px;
+    margin-bottom: 6px;
+    color: #a78bfa;
+  }
+  .bottom-cta p {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.6;
+  }
+
+  .hidden { display: none !important; }
+
+  /* 积分飞出动画 */
+  .points-fly {
+    position: fixed;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fbbf24;
+    pointer-events: none;
+    z-index: 999;
+    animation: flyUp 1s ease forwards;
+  }
+  @keyframes flyUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-80px) scale(1.3); }
+  }
+
+  /* 模块标签 */
+  .module-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .module-tabs::-webkit-scrollbar { display: none; }
+  .module-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: #888;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .module-tab:active { transform: scale(0.96); }
+  .module-tab.active {
+    border-color: #818cf8;
+    background: rgba(129,140,248,0.15);
+    color: #a78bfa;
+    font-weight: bold;
+  }
+
+  /* 模式切换 & 进度统计 */
+  .mode-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .mode-btn.active {
+    border-color: #818cf8;
+    background: rgba(129,140,248,0.15);
+    color: #a78bfa;
+    font-weight: bold;
+  }
+  .wrong-badge {
+    display: inline-block;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    margin-left: 4px;
+    font-weight: bold;
+  }
+  .progress-stats {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 12px;
+  }
+  .stat-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-tag .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-green { background: #10b981; }
+  .dot-red { background: #ef4444; }
+  .dot-gray { background: #555; }
+
+  /* 横向题目导航条 */
+  .nav-strip-wrap {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+  .nav-strip {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-strip::-webkit-scrollbar { height: 3px; }
+  .nav-strip::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+  .nav-dot {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04);
+    color: #666;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .nav-dot:active { transform: scale(0.9); }
+  .nav-dot.done {
+    border-color: #10b981;
+    background: rgba(16,185,129,0.15);
+    color: #34d399;
+  }
+  .nav-dot.wrong {
+    border-color: #ef4444;
+    background: rgba(239,68,68,0.15);
+    color: #f87171;
+  }
+  .nav-dot.current {
+    border-color: #a78bfa;
+    background: rgba(129,140,248,0.25);
+    color: #c4b5fd;
+    box-shadow: 0 0 10px rgba(129,140,248,0.4);
+    transform: scale(1.1);
+  }
+
+  /* 操作按钮栏 */
+  .action-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .action-row .btn {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 6px;
+    font-size: 13px;
+    margin-top: 0;
+    border-radius: 10px;
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.06);
+    color: #aaa;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: none;
+  }
+  .btn-review {
+    background: rgba(251,191,36,0.12);
+    color: #fbbf24;
+    border: 1px solid rgba(251,191,36,0.3);
+    box-shadow: none;
+  }
+
+  /* 完成视图 */
+  .complete-view {
+    text-align: center;
+    padding: 50px 20px;
+  }
+  .complete-view .emoji { font-size: 50px; margin-bottom: 16px; }
+  .complete-view h2 {
+    font-size: 20px;
+    color: #a78bfa;
+    margin-bottom: 8px;
+  }
+  .complete-view p {
+    font-size: 14px;
+    color: #888;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .reset-link {
+    text-align: center;
+    margin-top: 24px;
+  }
+  .reset-link a {
+    font-size: 12px;
+    color: #555;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="topbar">
+    <div class="points">
+      <span class="points-icon">⭐</span>
+      <span id="pointsDisplay">0</span> 积分
+    </div>
+    <div class="streak">
+      <span>🔥</span>
+      <span>连续 <b id="streakDisplay">0</b> 题</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <h1>🧠 逻辑填空修炼场</h1>
+    <p>语境呼应法 · 不用背成语也能做对题</p>
+  </div>
+
+  <div id="moduleTabs" class="module-tabs"></div>
+
+  <div id="modeToggle" class="mode-toggle">
+    <div class="mode-btn active" id="btnNew" onclick="switchMode('all')">全部题目</div>
+    <div class="mode-btn" id="btnWrong" onclick="switchMode('wrong')">错题回顾 <span id="wrongBadge" class="wrong-badge hidden">0</span></div>
+  </div>
+
+  <div class="progress-stats" id="progressStats">
+    <div class="stat-tag"><span class="dot dot-green"></span> 已掌握 <b id="statDone">0</b></div>
+    <div class="stat-tag"><span class="dot dot-red"></span> 待攻克 <b id="statWrong">0</b></div>
+    <div class="stat-tag"><span class="dot dot-gray"></span> 未做 <b id="statLeft">0</b></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0/0</div>
+  </div>
+
+  <div id="completeView" class="hidden">
+    <div class="card complete-view">
+      <div class="emoji">🎉</div>
+      <h2>本轮题目全部完成！</h2>
+      <p id="completeStats"></p>
+      <button class="btn btn-primary" id="btnGoWrong" onclick="switchMode('wrong')">回顾错题</button>
+      <div class="reset-link"><a onclick="resetAllProgress()">重置全部进度</a></div>
+    </div>
+  </div>
+
+  <div id="quizArea"></div>
+
+  <div id="navStripWrap" class="nav-strip-wrap">
+    <div class="nav-strip" id="navStrip"></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-ghost" onclick="redoAll()">🔄 全部重做</button>
+    <button class="btn btn-review" onclick="switchMode('wrong')">❌ 错题集</button>
+    <button class="btn btn-ghost" onclick="resetAllProgress()">🗑️ 重置进度</button>
+  </div>
+
+  <div id="resultArea" class="hidden">
+    <div class="card result-card">
+      <div class="result-emoji" id="resultEmoji"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-subtitle" id="resultSubtitle"></div>
+      <div class="result-score-box">
+        <div class="score-big" id="resultScore">0%</div>
+        <div class="score-label">正确率</div>
+      </div>
+      <div class="result-stats">
+        <div class="stat-item">
+          <div class="stat-num green" id="correctCount">0</div>
+          <div class="stat-desc">答对</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num red" id="wrongCount">0</div>
+          <div class="stat-desc">答错</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num gold" id="totalPoints">0</div>
+          <div class="stat-desc">获得积分</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:13px;color:#aaa;">100积分 = 1次一对一答疑服务</div>
+
+      <button class="btn btn-primary" onclick="restart()">再来一轮 🔄</button>
+
+      <div class="bottom-cta">
+        <h3>💡 想学会这套方法？</h3>
+        <p>关注B站「考公人tjmtkn」<br>更多语境呼应法技巧持续更新中</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 创建星空
+(function(){
+  const stars = document.getElementById('stars');
+  for(let i=0;i<50;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = Math.random()*3+'s';
+    s.style.width = s.style.height = (Math.random()*2+1)+'px';
+    stars.appendChild(s);
+  }
+})();
+
+// 模块定义：后续新增模块只需在此添加新条目
+const MODULES = {
+  yujing: {
+    id: 'yujing',
+    name: '语境呼应法',
+    icon: '🧠',
+    storageKey: 'yjhj_progress_yujing',
+    questionsRef: 'questions' // 指向下方 questions 数组
+  }
+  // 示例：新增模块只需加一行
+  // ciyu: { id: 'ciyu', name: '词语辨析', icon: '📖', storageKey: 'yjhj_progress_ciyu', questionsRef: 'questions_ciyu' }
+};
+let currentModuleId = 'yujing';
+
+function getCurrentModule() { return MODULES[currentModuleId]; }
+function getCurrentQuestions() { return questions; } // 当前只有语境模块，后续按 moduleId 映射
+
+// 渲染模块标签
+function renderModuleTabs() {
+  const container = document.getElementById('moduleTabs');
+  if (!container) return;
+  let html = '';
+  for (const key in MODULES) {
+    const m = MODULES[key];
+    const active = key === currentModuleId ? ' active' : '';
+    html += `<div class="module-tab${active}" onclick="switchModule('${key}')">${m.icon} ${m.name}</div>`;
+  }
+  container.innerHTML = html;
+}
+
+function switchModule(moduleId) {
+  if (moduleId === currentModuleId) return;
+  // 保存当前模块进度后切换
+  currentModuleId = moduleId;
+  // 加载新模块进度
+  loadProgress();
+  renderModuleTabs();
+  currentMode = 'all';
+  document.getElementById('btnNew').classList.add('active');
+  document.getElementById('btnWrong').classList.remove('active');
+  reviewMode = false;
+  startSession();
+}
+
+// localStorage 兼容层（file:// 协议下可能不可用）
+var safeStorage = {
+  _data: {},
+  getItem: function(key) {
+    try { return localStorage.getItem(key); } catch(e) { return this._data[key] || null; }
+  },
+  setItem: function(key, val) {
+    try { localStorage.setItem(key, val); } catch(e) { this._data[key] = val; }
+  },
+  removeItem: function(key) {
+    try { localStorage.removeItem(key); } catch(e) { delete this._data[key]; }
+  }
+};
+
+function getStorageKey() {
+  return 'yjhj_progress_' + currentModuleId;
+}
+
+// 进度持久化（按模块+用户独立存储）
+let currentMode = 'all';
+let activeList = [];
+let wrongList = [];
+let completedSet = {};
+let points = 0;
+
+function loadProgress() {
+  try {
+    const saved = JSON.parse(safeStorage.getItem(getStorageKey()) || '{}');
+    completedSet = saved.completed || {};
+    wrongList = saved.wrong || [];
+    points = saved.points || 0;
+  } catch(e) { completedSet = {}; wrongList = []; points = 0; }
+}
+
+function saveProgress() {
+  try { safeStorage.setItem(getStorageKey(), JSON.stringify({ completed: completedSet, wrong: wrongList, points: points })); } catch(e) {}
+}
+
+function getCompletedCount() { return Object.keys(completedSet).length; }
+
+function updateStats() {
+  const qs = getCurrentQuestions();
+  const done = getCompletedCount();
+  const wrong = wrongList.length;
+  const left = qs.length - done;
+  document.getElementById('statDone').textContent = done;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statLeft').textContent = left < 0 ? 0 : left;
+  const badge = document.getElementById('wrongBadge');
+  if (wrong > 0) { badge.textContent = wrong; badge.classList.remove('hidden'); }
+  else { badge.classList.add('hidden'); }
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('btnNew').classList.toggle('active', mode === 'all');
+  document.getElementById('btnWrong').classList.toggle('active', mode === 'wrong');
+  document.getElementById('completeView').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  document.querySelector('.progress-wrap').classList.remove('hidden');
+  reviewMode = false;
+  startSession();
+}
+
+function startSession() {
+  const qs = getCurrentQuestions();
+  currentQ = 0; score = 0; streak = 0;
+  answered = false;
+  if (currentMode === 'wrong') {
+    activeList = wrongList.slice();
+    reviewMode = true;
+  } else {
+    currentMode = 'all';
+    activeList = [];
+    for (let i = 0; i < qs.length; i++) activeList.push(i);
+  }
+  updateTopbar();
+  updateStats();
+  if (activeList.length === 0) {
+    showCompleteView();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showCompleteView() {
+  const qs = getCurrentQuestions();
+  document.getElementById('quizArea').classList.add('hidden');
+  document.querySelector('.progress-wrap').classList.add('hidden');
+  const done = getCompletedCount();
+  const wrong = wrongList.length;
+  const pct = Math.round(done / qs.length * 100);
+  let msg = `你已完成 ${done}/${qs.length} 道题（${pct}%）`;
+  if (wrong > 0) msg += `，还有 ${wrong} 道错题待攻克。`;
+  else if (done === qs.length) msg = '🎊 全部题目已掌握，太厉害了！';
+  document.getElementById('completeStats').textContent = msg;
+  document.getElementById('btnGoWrong').style.display = wrong > 0 ? 'block' : 'none';
+  document.getElementById('completeView').classList.remove('hidden');
+}
+
+function resetAllProgress() {
+  if (confirm('确定要重置当前模块所有进度和错题记录吗？')) {
+    safeStorage.removeItem(getStorageKey());
+    completedSet = {};
+    wrongList = [];
+    currentMode = 'all';
+    reviewMode = false;
+    document.getElementById('btnNew').classList.add('active');
+    document.getElementById('btnWrong').classList.remove('active');
+    startSession();
+  }
+}
+
+// 鼓励文案
+const correctMsgs = [
+  { emoji: '🎉', title: '太强了！', msg: '语境感知力拉满，这就是正确答案该有的样子。' },
+  { emoji: '✨', title: '漂亮！', msg: '每个字都对得上，你的语感正在变强。' },
+  { emoji: '🔥', title: '稳！', msg: '继续保持，这种题以后就是送分题。' },
+  { emoji: '💫', title: '答对了！', msg: '看到没？方法对了，根本不用背。' },
+  { emoji: '🌟', title: '厉害！', msg: '你已经开始用语境思维做题了，继续！' }
+];
+const wrongMsgs = [
+  { emoji: '🌱', title: '没关系，在成长', msg: '错题是最好的老师，看看解析，下次就会了。' },
+  { emoji: '💪', title: '差一点点', msg: '别灰心，语感是练出来的，再试一题。' },
+  { emoji: '🌊', title: '正常波动', msg: '高手也有错题，关键是看懂解析。' },
+  { emoji: '🧭', title: '换个思路', msg: '别急着背成语，回到原文找找线索。' },
+  { emoji: '☀️', title: '下一题见', msg: '错一道不可怕，可怕的是不看解析。看看吧～' }
+];
+
+const questions = [
+  {
+    tag: '逻辑填空 · 三空',
+    text: '食品感官科学研究范畴中的"电子舌头"要想有广阔的市场，必须要"走入寻常百姓家"，如果<span class="blank">①</span>，便失去了存在的意义。在食品安全领域，"电子舌头"大有可为，可以让不应过量乃至禁止掺入的添加剂<span class="blank">②</span>；在网络购物领域，"电子舌头"则提供了一种更为直观、<span class="blank">③</span>了解食品味道的方式，减少试错的风险。',
+    options: [
+      { label: 'A', words: ['顾影自怜','原形毕露','全面'] },
+      { label: 'B', words: ['曲高和寡','无处遁形','精准'], correct: true },
+      { label: 'C', words: ['孤芳自赏','难以为继','有效'] },
+      { label: 'D', words: ['徒有其表','烟消云散','深入'] }
+    ],
+    analysis: [
+      { tag: '第一空', text: '前文说<span class="kw">"走入寻常百姓家"</span>，"如果"表反面→意思是"不百姓化、太高雅没人懂"。' },
+      { tag: '排除A', text: '顾影自怜——<span class="kw">"怜"是可怜</span>，题干有"可怜"吗？没有。排除。' },
+      { tag: '排除C', text: '孤芳自赏——<span class="kw">"赏"是欣赏，"孤"是孤独</span>，题干里既没有"欣赏"也没有"孤独"的意思。排除。' },
+      { tag: '排除D', text: '徒有其表——<span class="kw">"表"是外表</span>，题干说外表吗？不是。排除。' },
+      { tag: '选B ✅', text: '曲高和寡——曲高（高雅）+和寡（没人跟），<span class="kw">字字对应"不入百姓家"</span>。' },
+      { tag: '第二空', text: '让添加剂<span class="kw">无处遁形</span>——"遁形"=躲起来，无处遁=躲不了，被查出来。字字对。' },
+      { tag: '第三空', text: '"直观、精准了解"——和直观并列，"精准"最贴合了解味道的场景。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '一般人不了解文字与思想情感的密切关系，以为更改和调整字句，不过是求语句顺畅和文字漂亮些，其实改动了文字，就同时<span class="blank">①</span>了思想情感，内容和形式也随之而变。作家唯有对人生百态有了深广的体悟后，才能用恰如其分的文字把自己的体验表现出来。咬文嚼字，表面上像只是斟酌文字的<span class="blank">②</span>，实际上是在<span class="blank">③</span>思想认识和情感表达。',
+    options: [
+      { label: 'A', words: ['弱化', '精美', '强调'] },
+      { label: 'B', words: ['变动', '分量', '调整'], correct: true },
+      { label: 'C', words: ['翻转', '精确', '提高'] },
+      { label: 'D', words: ['影响', '优美', '明确'] }
+    ],
+    analysis: [
+      { tag: '第一空', text: '前文说<span class="kw">"改动了文字，就同时___了思想情感"</span>——这个空要填的就是"改动了"的意思。' },
+      { tag: '排除A', text: '弱化——题里只是说"动"，并没有变弱的意思。排除。' },
+      { tag: '排除C', text: '翻转——"翻转"和"动"不是一个意思，程度太深了。排除。' },
+      { tag: '排除D', text: '影响——程度太浅，只说"影响"体现不出"改动"。排除。' },
+      { tag: '锁定B', text: '<span class="kw">变动</span>——"变"和"动"都在，字字对应"改动"。' },
+      { tag: '验证第二空', text: '"斟酌文字的<span class="kw">分量</span>"——斟酌字句，斟酌的就是文字的轻重分量，没问题。' },
+      { tag: '验证第三空', text: '"<span class="kw">调整</span>思想认识和情感表达"——呼应开头的"更改和调整字句"，没问题。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '党员干部必须拧紧世界观、人生观、价值观这个"总开关"，既避免"月黑风高无人见"的<span class="blank">①</span>，提防"你知我知天知地知"的花言巧语，也杜绝"富贵险中求"的<span class="blank">②</span>心理、纠正"法不责众"的错误认识。',
+    options: [
+      { label: 'A', words: ['欲盖弥彰', '犯罪'] },
+      { label: 'B', words: ['别有用心', '赌徒'] },
+      { label: 'C', words: ['心怀叵测', '激进'] },
+      { label: 'D', words: ['自欺欺人', '侥幸'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '<span class="kw">"月黑风高无人见"</span>——意思就是天黑、别人看不见，他以为别人看不见。' },
+      { tag: '排除A', text: '欲盖弥彰——<span class="kw">"弥彰"是更加明显</span>，想掩盖反而更明显。题干没有"更加明显"的体现。排除。' },
+      { tag: '排除B', text: '别有用心——题干没有体现"另有企图"。排除。' },
+      { tag: '排除C', text: '心怀叵测——题干也没有体现"心里藏着坏主意"。排除。' },
+      { tag: '锁定D', text: '<span class="kw">自欺欺人</span>——以为别人看不见，就是骗自己"没人看见"，正好对应。' },
+      { tag: '第二空验证', text: '<span class="kw">"富贵险中求"</span>——冒着风险求富贵，盼的是运气，这就是<span class="kw">"侥幸"</span>心理。验证通过，选D。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '考古学的早期实践是自然史的延伸，就是以进化模式来安排考古材料。人类的历史和文化被看作是一种<span class="blank">①</span>的过程，世界各地的文化发展遵循相同的轨迹，文化差异是由发展速率的快慢所造成。这种直线进化论存在明显弱点，导致种族主义考古学<span class="blank">②</span>，把原住民文化看作生物学因素造成的<span class="blank">③</span>现象，无法发展到更高级的阶段。',
+    options: [
+      { label: 'A', words: ['自然', '泛滥', '滞后'] },
+      { label: 'B', words: ['加速', '盛行', '反常'] },
+      { label: 'C', words: ['演进', '流行', '落后'], correct: true },
+      { label: 'D', words: ['演变', '胜出', '极端'] }
+    ],
+    analysis: [
+      { tag: '第一空', text: '开头说<span class="kw">"以进化模式来安排考古材料"</span>——什么样的过程？进化的过程，就是"演变、演进"。' },
+      { tag: '排除A、B', text: '<span class="kw">自然</span>——题干说的是"进化"的过程，不是"自然"的过程；<span class="kw">加速</span>——题干只说发展速率有快有慢，没有"加速"的意思。两个都排除。' },
+      { tag: '第二空', text: '"导致种族主义考古学___"——想表达的是这种学说<span class="kw">"流行"</span>起来。D的"胜出"是比赛赢了，这里没有比赛语境，"流行"比"胜出"好。' },
+      { tag: '第三空', text: '<span class="kw">"无法发展到更高级的阶段"</span>——那就是"落后"。D的"极端"没有这个意思，排除。' },
+      { tag: '选C ✅', text: '<span class="kw">演进</span>（进化的过程）→<span class="kw">流行</span>（学说盛行）→<span class="kw">落后</span>（无法发展到高级阶段），三个空全部对上。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '近年来，"打卡无人区"成为一些人的时髦选择，诸如青海可可西里、新疆罗布泊等人迹罕至的自然保护区，成了不少人<span class="blank">①</span>的人间秘境。但是，"无人区"及自然生态保护区，远没有外界想象得那么浪漫和神秘。每个游客及旅行团都要深刻认识到这类地区的极端危险性，切莫仅凭一腔热血与<span class="blank">②</span>，就盲目进发。',
+    options: [
+      { label: 'A', words: ['念兹在兹', '念想'] },
+      { label: 'B', words: ['念念不忘', '激情'] },
+      { label: 'C', words: ['心驰神往', '好奇'], correct: true },
+      { label: 'D', words: ['心醉神迷', '勇气'] }
+    ],
+    analysis: [
+      { tag: '第一空', text: '<span class="kw">"成了不少人____的人间秘境"</span>——表达的是人们对这个地方的<span class="kw">"向往"</span>。' },
+      { tag: '排除B', text: '念念不忘——是<span class="kw">去过之后忘不掉、一直惦记</span>，题干里他们还没去，是要去"打卡"。排除。' },
+      { tag: '排除D', text: '心醉神迷——程度太重了，<span class="kw">"醉"都醉了、被迷惑住了</span>，题干没到这个程度。排除。' },
+      { tag: '第二空', text: '剩下A和C。A的<span class="kw">"念想"</span>跟B"念念不忘"一样，是惦记，题干并没有表达惦记；整段话一直在写无人区"神秘"，人们对那个地方是<span class="kw">"好奇"</span>。' },
+      { tag: '锁定C ✅', text: '第二空"好奇"锁C。回头验证第一空<span class="kw">"心驰神往"</span>——心神都奔向那个地方了，正好对应"向往的人间秘境"。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '党的纪律明确了不能触碰的底线和边界，莫说"五十步"，万钧之下，雷池禁区一步也不可<span class="blank">①</span>。以"错更小"来开脱，既是对法纪缺乏敬畏心的表现，也是对反腐败"无禁区、全覆盖、零容忍"态势的错判。在小事上打开缺口，<span class="blank">②</span>边界，看似微不足道的一包烟、一顿饭，就会化为沉沦的绳索，拉着人在失守变质的路上坠。掩耳盗铃之举，终将贻害自己。',
+    options: [
+      { label: 'A', words: ['跨越', '泛化'] },
+      { label: 'B', words: ['逾越', '模糊'], correct: true },
+      { label: 'C', words: ['僭越', '漠视'] },
+      { label: 'D', words: ['超越', '混淆'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '<span class="kw">"雷池禁区一步也不可___"</span>——雷池是界限，这句话想说的是：这个界限你不能跨，跨了就是不对。' },
+      { tag: '排除A', text: '跨越——它虽然也有"跨"的意思，但它是个<span class="kw">中性词</span>。打个比方：你想要一个红苹果，A只是"苹果"，没有"红"那层意思。题干要的是"违规地跨"，"跨越"不带这层色彩。排除。' },
+      { tag: '排除D', text: '超越——跟A"跨越"一样，是中性词，没有"越界"的意思。排除。' },
+      { tag: '保留B、C', text: '<span class="kw">逾越</span>、<span class="kw">僭越</span>都带着"越界"的意思，先保留。' },
+      { tag: '第二空', text: '"在小事上打开缺口，___边界"——B是<span class="kw">"模糊"</span>边界，C是<span class="kw">"漠视"</span>边界。' },
+      { tag: '锁定B ✅', text: '这道题不是说他<span class="kw">看不见</span>边界——他知道边界在哪、他看得见；他是把边界一点点弄模糊。"漠视"是看不见、不当回事，"模糊"是明明知道却把它弄糊。所以<span class="kw">"模糊"</span>更好，选B。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '在文旅热的当下，依托名人资源、打造驰名IP、凸显地方特色，是在日益激烈的竞争中<span class="blank">①</span>的捷径。但同样不可否认的是，争夺名人故里是企图以"四两拨千斤"的"巧劲"回避文化建设的漫长与艰苦。我们必须警惕争夺名人故里背后所体现出的急功近利的浮躁心态。这种浮躁心态与文化建设规律<span class="blank">②</span>，不利于文旅事业高质量发展。',
+    options: [
+      { label: 'A', words: ['出类拔萃', '南辕北辙'] },
+      { label: 'B', words: ['一鸣惊人', '适得其所'] },
+      { label: 'C', words: ['脱颖而出', '背道而驰'], correct: true },
+      { label: 'D', words: ['崭露头角', '分道扬镳'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '<span class="kw">"在日益激烈的竞争中___的捷径"</span>——想表达的是在竞争中"凸显出来"。' },
+      { tag: '排除B', text: '一鸣惊人——题干没有说要"一下子惊呆所有人、一夜成名"，只是想凸显出来。排除。' },
+      { tag: '排除D', text: '崭露头角——是只冒出一个小脚、刚刚显露一点，程度太轻；题干要的是在激烈竞争中凸显出来。排除。' },
+      { tag: '剩A、C', text: '剩下<span class="kw">出类拔萃</span>和<span class="kw">脱颖而出</span>，看第二空。' },
+      { tag: '第二空', text: '"这种浮躁心态与文化建设规律___"——想说的是两者<span class="kw">"相违背"</span>。' },
+      { tag: '排除A', text: '南辕北辙——它的意思是<span class="kw">行动和目的相反</span>（心里想往南，车子却往北开）。这里不是行动和目的的问题，是"心态"和"规律"相违背。排除。' },
+      { tag: '锁定C ✅', text: '<span class="kw">背道而驰</span>——"背道"就是方向相反，浮躁心态和文化建设规律正好方向相反、相违背。选C。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '不同国家和民族之间的对话，很大一部分是建立在世界意识的基础之上。世界之大，个人只能涉足有限的处所；作为一种彼此相知的语汇，文学可以帮助不同民族的人们<span class="blank">①</span>，乃至共同参与世界。所以，世界范围<span class="blank">②</span>的文学经典展示了"人类"的存在。"人类"生活在地球的各个角落，然而，他们是相互联系的共同体——不论他们自己能否意识到这一点。',
+    options: [
+      { label: 'A', words: ['心中有数', '形形色色'] },
+      { label: 'B', words: ['心心相印', '跃然纸上'] },
+      { label: 'C', words: ['心领神会', '林林总总'], correct: true },
+      { label: 'D', words: ['融会贯通', '多姿多彩'] }
+    ],
+    analysis: [
+      { tag: '第一空', text: '"作为一种彼此相知的语汇，文学可以帮助不同民族的人们<span class="kw">___</span>，乃至共同参与世界"——A心中有数、B心心相印、D融会贯通，<span class="kw">第一空四个词都排除不了</span>，不在这一空纠结，直接看第二空。' },
+      { tag: '第二空·语境', text: '"世界范围___的文学经典展示了\'人类\'的存在。<span class="kw">\'人类\'生活在地球的各个角落</span>"——这个空想表达的就是：<span class="kw">各个角落都有、到处都是</span>。' },
+      { tag: '排除A', text: '形形色色——<span class="kw">一般形容人</span>（形形色色的人），这里说的是文学经典，不贴。排除。' },
+      { tag: '排除D', text: '多姿多彩——多姿多彩可以形容文学，"好"和"多"都有，但题干只说"各个角落都有"，<span class="kw">并没有强调"好"</span>这个意思。不符合，排除。' },
+      { tag: '锁定C ✅', text: '<span class="kw">林林总总</span>——感受一下这个词，它就是"各个角落、到处都有"的那种感觉，正好对应"生活在地球的各个角落"。答案选C（心领神会／林林总总）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 单空',
+    text: '在其他动物体内，抗体的重轻链配对组成的Y形结构可以对抗种类繁多的微生物入侵者。这种结构久经考验，是重链和轻链蛋白质的编码基因片段混合重排的结果。由于每一条链对应的基因排列方式多种多样，所以组合起来就可以千变万化，而纳米抗体只有重链，多样性<span class="blank">①</span>。',
+    options: [
+      { label: 'A', words: ['大打折扣'], correct: true },
+      { label: 'B', words: ['寥寥无几'] },
+      { label: 'C', words: ['微乎其微'] },
+      { label: 'D', words: ['乏善可陈'] }
+    ],
+    analysis: [
+      { tag: '语境方向', text: '"由于每一条链对应的基因排列方式多种多样，所以组合起来可以<span class="kw">千变万化</span>，<span class="kw">而</span>纳米抗体只有重链"——"而"一转：别人千变万化，它只有重链，那多样性肯定是<span class="kw">降低</span>。' },
+      { tag: '锁定A', text: '<span class="kw">大打折扣</span>可以保留——"打折"就是降低，多样性打了折扣，就是变少了。' },
+      { tag: '排除B、C', text: '寥寥无几、微乎其微——这两个词表达的是<span class="kw">"非常少"</span>，但这道题只是说多样性<span class="kw">少了</span>、降低了，<span class="kw">并没有说"非常少"</span>。程度不对，排除。' },
+      { tag: '排除D', text: '乏善可陈——这个词我并不知道啥意思，但我看到<span class="kw">"陈"有陈述的意思</span>，而这句话里根本没有"陈述"的意思，所以它不符合，排除。' },
+      { tag: '选A ✅', text: '<span class="kw">大打折扣</span>——只有重链，多样性打了折扣，正好对应"降低"。选A。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '勤劳智慧的黔东南人民始终<span class="blank">①</span>着与大自然"万物共生"的传统，响应季节变化，熟悉土地秉性，主动顺应、融入大自然生态系统，形成了生态养殖、种植和绿色循环、发展的完整生物链。作为典型的人工生态系统，从江稻鱼鸭复合系统具有保护生物多样性、控制病虫害、调节气候、<span class="blank">②</span>水源等多种生态功能。',
+    options: [
+      { label: 'A', words: ['坚守', '涵养'], correct: true },
+      { label: 'B', words: ['遵守', '滋润'] },
+      { label: 'C', words: ['恪守', '蓄积'] },
+      { label: 'D', words: ['信守', '保持'] }
+    ],
+    analysis: [
+      { tag: '第一空·抓关键词', text: '"勤劳智慧的黔东南人民<span class="kw">始终</span>___着与大自然\'万物共生\'的传统"——什么叫做"始终"？<span class="kw">始终就是一直</span>。' },
+      { tag: '锁定A', text: '看ABCD四个词，只有<span class="kw">"坚守"的"坚"有"一直"的意思</span>（坚=一直、坚持不动摇），所以大概率就把选项定位到A。' },
+      { tag: '第二空验证 ✅', text: '第二空不用多看，把A带进去验证："保护生物多样性、控制病虫害、调节气候、<span class="kw">涵养水源</span>"——很对呀，没有问题。<span class="kw">答案锁定A</span>（坚守／涵养）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '古徽州地处山区，受地理因素限制，无法像中原世族一样修建豪宅大院，只能在风格和工艺上<span class="blank">①</span>，追求极致的雕刻，因而逐渐形成斗技、斗艺的风尚。受此影响，徽州的砖雕、木雕和石雕不仅图案日渐<span class="blank">②</span>，而且形成了极为丰富的层次。',
+    options: [
+      { label: 'A', words: ['精雕细琢', '精美'] },
+      { label: 'B', words: ['狂放不羁', '奇绝'] },
+      { label: 'C', words: ['另辟蹊径', '繁复'], correct: true },
+      { label: 'D', words: ['独具慧眼', '精细'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境呼应', text: '<span class="kw">"受地理因素限制，无法像中原世族一样修建豪宅大院，只能在风格和工艺上___，追求极致的雕刻"</span>→因为地理受限走不了豪宅大院的路，只能换一条路在风格和工艺上做文章→这就是<span class="kw">"另辟蹊径"</span>——另走一条路。' },
+      { tag: '排除A', text: '精雕细琢——<span class="kw">后文已经有"追求极致的雕刻"</span>，如果填"精雕细琢"就和"雕刻"语义重复了。排除。' },
+      { tag: '排除B', text: '狂放不羁——<span class="kw">"狂放"是任性豪放，"不羁"是不受约束</span>，题干说的是受地理限制而换路走，不是任性豪放。排除。' },
+      { tag: '排除D', text: '独具慧眼——<span class="kw">"慧眼"是能识别出好东西</span>，但题干并没有说"这个东西好所以我才去雕刻"，而是说"因为受地理因素影响，所以我才在风格和工艺上做"。是被动换路，不是主动识别好物。排除。' },
+      { tag: '选C第一空 ✅', text: '<span class="kw">另辟蹊径</span>——"另"=另外，"辟"=开辟，"蹊径"=小路。受地理限制修不了豪宅大院，只好另外开辟一条路，在风格和工艺上追求极致，字字对应。' },
+      { tag: '第二空·验证', text: '把C的<span class="kw">"繁复"</span>带入第二空——"图案日渐繁复，而且形成了极为丰富的层次"。"繁复"和"丰富的层次"呼应，逻辑通顺，符合文意。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '我们在网上经常看见一些误导性消息，这些信息可能<span class="blank">①</span>，但其背后的操纵策略往往<span class="blank">②</span>。因此，对心理学家而言，它们都<span class="blank">③</span>，研究表明，让观众了解误导信息的操纵策略，就能帮助人们提升分辨误导信息的能力。',
+    options: [
+      { label: 'A', words: ['五花八门', '如出一辙', '不过尔尔'] },
+      { label: 'B', words: ['千奇百怪', '千篇一律', '有迹可循'], correct: true },
+      { label: 'C', words: ['故弄玄虚', '机关算尽', '不足为奇'] },
+      { label: 'D', words: ['煞有介事', '平平无奇', '别有用心'] }
+    ],
+    analysis: [
+      { tag: '先抓关系', text: '<span class="kw">"这些信息可能___，但其背后的操纵策略往往___"</span>——"但"表转折，说明前两个空是<span class="kw">反义关系</span>：信息表面上多种多样，背后的策略却是统一的套路。' },
+      { tag: '第一空方向', text: '信息可能"多种多样"：五花八门、千奇百怪都符合这个方向。' },
+      { tag: '排除C', text: '故弄玄虚——<span class="kw">故意玩弄花招迷惑人</span>，这不是"多种多样"的意思，方向不对。排除。' },
+      { tag: '排除D', text: '煞有介事——<span class="kw">装模作样、像真有那么回事</span>，也不是"多种多样"。排除。' },
+      { tag: '第三空·锁定', text: '<span class="kw">"研究表明，让观众了解误导信息的操纵策略，就能帮助人们提升分辨能力"</span>——既然"了解策略"就能"分辨"，说明这些策略是<span class="kw">"有迹可循"</span>的（有痕迹可以追寻）。' },
+      { tag: '排除A', text: '不过尔尔——<span class="kw">"尔尔"=如此而已</span>，是说不过如此、没什么了不起。但题干说的是"能被了解、能被分辨"，强调的是<span class="kw">有规律可找</span>，不是"不过如此"。排除。' },
+      { tag: '选B ✅', text: '<span class="kw">千奇百怪</span>（信息花样多）→<span class="kw">千篇一律</span>（策略都是同一个套路）→<span class="kw">有迹可循</span>（所以了解策略就能分辨）。三个空环环相扣，逻辑通顺。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '目前，菜市场"代炒"服务只在部分区域出现，经营规模也比较小，恐怕还难将其称为一种<span class="blank">①</span>。不过，"代炒"的出现不仅给消费者解决餐食问题提供了一种新的选择，也是菜市场主动转型升级、拓宽业务的一种<span class="blank">②</span>。',
+    options: [
+      { label: 'A', words: ['趋势', '创新'] },
+      { label: 'B', words: ['业态', '尝试'], correct: true },
+      { label: 'C', words: ['态势', '试验'] },
+      { label: 'D', words: ['模式', '测试'] }
+    ],
+    analysis: [
+      { tag: '第一空·抓关键词', text: '"<span class="kw">目前</span>，代炒服务只在部分区域出现，经营规模也比较小，恐怕还难将其称为一种___"——注意关键词"目前"，就是现在、当下的意思。' },
+      { tag: '排除A、C', text: 'A<span class="kw">"趋势"</span>和C<span class="kw">"态势"</span>都有未来、发展方向的意思，跟"目前"不是一个时间维度。排除。' },
+      { tag: '排除D', text: '<span class="kw">"模式"</span>——文章要表达的应该是规模比较大的那种东西，"模式"并不能展现这种大的方面，所以也不对，排除。' },
+      { tag: '锁定B', text: '大概率就是B<span class="kw">"业态"</span>——业态就是指一种经营形态、商业形态，跟规模相关。' },
+      { tag: '第二空验证 ✅', text: '"也是菜市场主动转型升级、拓宽业务的一种<span class="kw">尝试</span>"——"尝试"放进去完全没有问题。<span class="kw">选B</span>（业态／尝试）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '每个新物种命名的背后，都凝结了科研人员大量野外采样、鉴定描述、遍稽群籍的工作积累。不论它们的名字对我们而言是<span class="blank">①</span>，还是新鲜陌生，它们都是独一无二的。正是这一点一滴的新发现，逐渐构建了人类对广袤世界中的生物多样性的认识。而我们现在所认识的物种数量，相较于隐藏在海洋深处、雨林秘境或者其他人类迹罕至之地的丰富物种而言，还只是<span class="blank">②</span>。',
+    options: [
+      { label: 'A', words: ['如数家珍', '初露端倪'] },
+      { label: 'B', words: ['如雷贯耳', '沧海一粟'] },
+      { label: 'C', words: ['家喻户晓', '管中窥豹'] },
+      { label: 'D', words: ['耳熟能详', '冰山一角'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·抓转折', text: '"不论它们的名字对我们而言是___，<span class="kw">还是新鲜陌生</span>"——"还是"表转折，所以前面应该是<span class="kw">"熟悉"</span>的意思，跟"新鲜陌生"相反。' },
+      { tag: '保留A、C、D', text: 'A<span class="kw">如数家珍</span>——有熟悉的意思，可以；C<span class="kw">家喻户晓</span>——每家每户都知道，也有熟悉的意思；D<span class="kw">耳熟能详</span>——听得多了很熟悉，也是熟悉的意思。三个都有"熟悉"义，先保留。' },
+      { tag: '排除B', text: '<span class="kw">"如雷贯耳"</span>——给我的感觉是声音很大、名气很大那种，跟"熟悉"没关系。排除。' },
+      { tag: '第二空·语境', text: '"我们现在所认识的物种数量……还只是___"——想表达的是我们认识的物种数量<span class="kw">非常少</span>。' },
+      { tag: '排除A', text: '<span class="kw">"初露端倪"</span>——意思是刚刚露出一点头，跟我们认识的物种"少"没啥关联。排除。' },
+      { tag: '排除C', text: '<span class="kw">"管中窥豹"</span>——从管子里看豹子，有小中见大的意思，跟"少"的关系不大，也跟"熟悉"没太大关系。排除。' },
+      { tag: '锁定D ✅', text: '<span class="kw">"冰山一角"</span>——表达的就是还很少，只是看到了一小部分，正好对应"我们认识的相对于实际存在的非常少"。<span class="kw">选D</span>（耳熟能详／冰山一角）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 单空',
+    text: '我国疆域辽阔，各地区资源禀赋各有特点，经济互补性强、依存度高。各民族始终保持<span class="blank">①</span>、互利共赢的经济联系，有力增强了国家整体实力，促进了中华民族共同体的形成和发展。',
+    options: [
+      { label: 'A', words: ['礼尚往来'] },
+      { label: 'B', words: ['守望相助'] },
+      { label: 'C', words: ['互通有无'], correct: true },
+      { label: 'D', words: ['和衷共济'] }
+    ],
+    analysis: [
+      { tag: '抓语境', text: '各民族始终保持___、<span class="kw">互利共赢</span>的经济联系——这个空应该跟"互利共赢"是一样的意思。互利共赢是什么意思？<span class="kw">互相给予好处，然后共同前进</span>。' },
+      { tag: '排除B', text: '<span class="kw">"守望相助"</span>——题干里没有"守望"的意思，排除。' },
+      { tag: '排除D', text: '<span class="kw">"和衷共济"</span>——就是一起来共同面对困难，题干并没有想表达"团结面对困难"的意思，它想表达的是<span class="kw">互补</span>，排除。' },
+      { tag: '比较A和C', text: 'A<span class="kw">"礼尚往来"</span>——你给我、我给你，有这个意思，可以放；C<span class="kw">"互通有无"</span>——你没有的我给你、我没有的你给我，就是这个意思。' },
+      { tag: '锁定C ✅', text: '题干前面说<span class="kw">"经济互补性强、依存度高"</span>，"互通有无"正好对应"互补"——你有的我没有、我有的你没有，互相交换。相对来讲C是更好的。<span class="kw">选C</span>（互通有无）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '一种能监测心脏术后并发症的新设备可以完成比传统的起搏器更复杂的监测。起搏器只能提供心脏的整体图像，但新设备可以提供更<span class="blank">①</span>的图像，具体显示出心脏哪些区域功能不正常。其上分布的微电极阵列可从心房的多个位置绘制电信号活动，并按需传递电刺激，以便在<span class="blank">②</span>的时候解除房颤，恢复正常心律。',
+    options: [
+      { label: 'A', words: ['清晰', '需要'] },
+      { label: 'B', words: ['细致', '关键'], correct: true },
+      { label: 'C', words: ['直观', '适当'] },
+      { label: 'D', words: ['完整', '凶险'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境对比', text: '"起搏器只能提供心脏的<span class="kw">整体</span>图像，但新设备可以提供更___的图像，<span class="kw">具体</span>显示出心脏哪些区域功能不正常"——前面说"整体"，后面说"具体"，那肯定是更<span class="kw">细致</span>了。' },
+      { tag: '排除D', text: '<span class="kw">"完整"</span>——前面已经说了"整体"，完整和整体是同一个意思，没有递进关系，排除。' },
+      { tag: '锁定B', text: '"具体显示出哪些区域不正常"——具体，那肯定就是更<span class="kw">细致</span>了，大概率锁定B。' },
+      { tag: '第二空验证 ✅', text: '"以便在___的时候解除房颤，恢复正常心律"——<span class="kw">"关键"</span>的时候解除房颤、恢复正常心率，放进去完全可以。<span class="kw">选B</span>（细致／关键）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '人工智能技术飞速发展，逐渐向人类智能水平逼近。科学家们在研究过程中愈发清晰地意识到，许多棘手的问题并非单凭一家公司之力就能成功解决。除了至今<span class="blank">①</span>的"电车难题"外，还有日益重要的价值观<span class="blank">②</span>问题——当AI拥有了自主设定目标的能力时，又该如何确保这些由AI自行确定的目标符合人类利益、与人类价值观相<span class="blank">③</span>？',
+    options: [
+      { label: 'A', words: ['争论不休', '构建', '吻合'] },
+      { label: 'B', words: ['流口常谈', '践行', '出入'] },
+      { label: 'C', words: ['悬而未决', '对齐', '契合'], correct: true },
+      { label: 'D', words: ['束手无策', '匹配', '切合'] }
+    ],
+    analysis: [
+      { tag: '第一空·抓语境', text: '"许多棘手的问题<span class="kw">并非单凭一家公司之力就能成功解决</span>"——证明这个事<span class="kw">没解决</span>。所以第一空要表达的是"还没解决"。' },
+      { tag: '排除D', text: '<span class="kw">"束手无策"</span>——这是说没有策略、没办法，但这道题讨论的是"解决与没解决"的事，不是"有没有策略"的事，排除。' },
+      { tag: '排除A、B', text: '这道题所要讨论的是<span class="kw">解没解决</span>，而不是"我们一直在争论"——跟争论没有关系，所以把A<span class="kw">"争论不休"</span>和B<span class="kw">"流口常谈"</span>也排除。' },
+      { tag: '锁定C', text: '<span class="kw">"悬而未决"</span>——挂着、还没解决，正好对应"至今没有解决"的语境。' },
+      { tag: '第二空·语境', text: '"价值观___问题"——C是<span class="kw">"对齐"</span>。第一次看到"对齐"这个词可能会觉得好像不太合理，但它放到这里是能够说得过去的——价值观对齐，就是让AI的价值观跟人类的价值观对齐。' },
+      { tag: '第三空验证 ✅', text: '"与人类价值观相___"——C<span class="kw">"契合"</span>——AI自行确定的目标符合人类利益、与人类价值观相契合，完全可以。<span class="kw">选C</span>（悬而未决／对齐／契合）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '在寸土寸金的城市里，体育场馆不足、体育场馆收费过高等问题一直都<span class="blank">①</span>着市民。2022年全国体育场地统计调查数据显示，包括公办学校在内的事业单位体育场地面积占全国的四成多。鼓励学校免费或低收费对社会开放，鼓励社会力量积极参与学校体育场馆开放，不仅是对这一文件精神的积极践行，也是对全民运动、全民健康的一种支持，其价值<span class="blank">②</span>。',
+    options: [
+      { label: 'A', words: ['束缚', '有目共睹'] },
+      { label: 'B', words: ['限制', '显而易见'] },
+      { label: 'C', words: ['影响', '毋庸置疑'] },
+      { label: 'D', words: ['困扰', '不言而喻'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·语境方向', text: '"体育场馆不足、收费过高等问题一直都___着市民"——肯定这个问题很<span class="kw">困扰</span>市民，是个负面影响。' },
+      { tag: '排除A、B', text: 'A<span class="kw">"束缚"</span>——并不是说"束缚"着市民，语义不对；B<span class="kw">"限制"</span>——和A"束缚"一样，都是限制自由的意思，这里说的不是限制市民，是问题让市民难受。排除。' },
+      { tag: '排除C', text: '<span class="kw">"影响"</span>——影响是一个<span class="kw">中性词</span>，可以好也可以不好，但这道题很明显表达的是不好的意思，所以不对。排除。' },
+      { tag: '锁定D', text: '大概率是D<span class="kw">"困扰"</span>——问题一直困扰着市民，语义完全对。' },
+      { tag: '第二空验证 ✅', text: '"也是对全民运动、全民健康的一种支持，其价值___"——D<span class="kw">"不言而喻"</span>——价值不用说就很清楚、不言自明，完全可以。<span class="kw">选D</span>（困扰／不言而喻）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '历史上的一切医学手段都包含着<span class="blank">①</span>的改善身体的愿望。鉴于生命科学对于人类生物学结构和功能的理解仍然非常<span class="blank">②</span>，在脑科学领域尤其如此，故不能指望生物技术在短期内对人类本性做出实质性的改变，但“更好的人类”这个未来的发展趋势已经出现。',
+    options: [
+      { label: 'A', words: ['显而易见', '通俗'] },
+      { label: 'B', words: ['尽善尽美', '粗浅'] },
+      { label: 'C', words: ['朴实无华', '晦涩'] },
+      { label: 'D', words: ['不言而喻', '有限'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·通读', text: '“历史上的一切医学手段都包含着___的改善身体的愿望”——先看四个选项。' },
+      { tag: 'A·先留着', text: '<span class="kw">“显而易见”</span>——就是很明显的意思。目前排除不了，不好说，先留着。' },
+      { tag: '排除B', text: '<span class="kw">“尽善尽美”</span>——我们知道，一般“尽善尽美”出现的时候，这个选项基本都是错误的，所以你给它排除了就完事了。' },
+      { tag: '排除C', text: '<span class="kw">“朴实无华”</span>——“朴实无华的改善身体愿望”，这个不太合适，也没有表达这方面的意思，所以排除。' },
+      { tag: 'D·也留着', text: '<span class="kw">“不言而喻”</span>——就是不用说的意思嘛，这个也不太好排除，我们得往下看。' },
+      { tag: '第二空·看语境', text: '“鉴于生命科学对于人类生物学结构和功能的理解仍然非常___……故不能指望生物技术在短期内对人类本性做出实质性的改变”——剩下A和D。A第二空是<span class="kw">“通俗”</span>，“理解非常通俗”放在这里不太合适。' },
+      { tag: '锁定D ✅', text: '后面说“不能在短期内做出实质性的改变”，说明这个理解应该是<span class="kw">有限的</span>——理解有限，所以短时间内改变不了，这样对应是更好的。<span class="kw">选D</span>（不言而喻／有限）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '从历史上看，世界文化交流互鉴的本质是在尊重差异、<span class="blank">①</span>的基础上，寻求不同文明之间的共同价值，一方面是<span class="blank">②</span>自我，不失去原有的文化根基与血脉；另一方面则是平等相待，吐故纳新。',
+    options: [
+      { label: 'A', words: ['求同存异', '保有'], correct: true },
+      { label: 'B', words: ['兼容并蓄', '提高'] },
+      { label: 'C', words: ['和衷共济', '坚持'] },
+      { label: 'D', words: ['一视同仁', '突破'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境方向', text: '"世界文化交流互鉴的本质是在尊重差异、___的基础上"——第一空填的应该和"尊重差异"差不多意思。' },
+      { tag: 'A·先留着', text: '<span class="kw">"求同存异"</span>——可以，尊重差异求同存异，说得通，先留着。' },
+      { tag: 'B·也留着', text: '<span class="kw">"兼容并蓄"</span>——也可以，兼容并蓄意思相近，也先留着。' },
+      { tag: '排除C', text: '<span class="kw">"和衷共济"</span>——更加强调的是团结，这块强调的是尊重差异，不是团结，所以排除。' },
+      { tag: '排除D', text: '<span class="kw">"一视同仁"</span>——人家让你尊重差异，你一视同仁那肯定不对了，排除。' },
+      { tag: '第二空·看语境', text: '"一方面是___自我，不失去原有的文化根基与血脉"——A第二空是<span class="kw">"保有"</span>，保有自我，保有原有的文化与根基；B第二空是<span class="kw">"提高"</span>，提高自我跟这个语境不太搭。' },
+      { tag: '锁定A ✅', text: '所以选<span class="kw">A</span>（求同存异／保有）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '实现不贰过，应当从破除三种心态做起。其一是<span class="blank">①</span>的"鸵鸟心态"。当错误被发现时，一些党员干部不是正视问题、剖析问题、改正问题，而是像鸵鸟一样把头埋起来，以为"看不见"就"不存在"。其二是<span class="blank">②</span>的"看客心态"。有人把反面教材当作是别人的事，认为与自己无关；有人对警示教育的态度是听过了就通过了、看完了就完事了。其三是<span class="blank">③</span>的"过关心态"。一些党员干部明面上"照单全收"，表态"问题不整改不放过"，却只局限于就错论错、就错改错，没有举一反三，疏于分析问题滋生的土壤，不从制度上去堵塞漏洞，看似"过关"却未"通关"。',
+    options: [
+      { label: 'A', words: ['避重就轻', '作壁上观', '安于现状'] },
+      { label: 'B', words: ['掩耳盗铃', '敷衍了事', '自暴自弃'] },
+      { label: 'C', words: ['讳疾忌医', '事不关己', '得过且过'], correct: true },
+      { label: 'D', words: ['自欺欺人', '隔岸观火', '听天由命'] }
+    ],
+    analysis: [
+      { tag: '第一空·解题点', text: '"鸵鸟心态"——像鸵鸟一样把头埋起来，以为"看不见"就"不存在"。这是解题点。' },
+      { tag: '排除A', text: '<span class="kw">"避重就轻"</span>——躲避重的去轻的，没有说轻重问题，只是说以为看不见就不存在，不符合，排除。' },
+      { tag: 'B·先留着', text: '<span class="kw">"掩耳盗铃"</span>——掩住耳朵以为听不见就没事，跟"看不见"加引号意思同源，先留下来。' },
+      { tag: 'C·也留着', text: '<span class="kw">"讳疾忌医"</span>——以为不去看就没事，这也是自欺欺人，也留着。' },
+      { tag: '先看第三空', text: '"过关心态"——就错论错、就错改错，没有举一反三，改得不彻底。B第三空<span class="kw">"自暴自弃"</span>——没有表达自暴自弃的意思，排除；D<span class="kw">"听天由命"</span>——根本没有体现，排除。' },
+      { tag: '锁定C', text: 'C第三空<span class="kw">"得过且过"</span>——改得不彻底、敷衍应付，可以的。' },
+      { tag: '第二空验证 ✅', text: '"看客心态"——认为与自己无关、听过了就通过了。C第二空<span class="kw">"事不关己"</span>——事不关己高高挂起，就是这个意思，完全对。<span class="kw">选C</span>（讳疾忌医／事不关己／得过且过）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '我们一方面渴望独立自主，另一方面也需要有所倚靠，但在人际关系中，我们偏只愿意强调其中一方。更为<span class="blank">①</span>的是，我们有可能为了依赖而独立，也有可能是为了独立而依赖。关于两种观念体系孰是孰非的讨论<span class="blank">②</span>，但是每一个做父母的人至少应该知道有这两种相互<span class="blank">③</span>的观念存在。',
+    options: [
+      { label: 'A', words: ['可惜', '见仁见智', '冲突'] },
+      { label: 'B', words: ['复杂', '莫衷一是', '龃龉'], correct: true },
+      { label: 'C', words: ['重要', '悬而未决', '纠缠'] },
+      { label: 'D', words: ['麻烦', '由来已久', '抵触'] }
+    ],
+    analysis: [
+      { tag: '第二空·解题点', text: '"关于这两种观念体系孰是孰非的讨论___，但是"——"但是"一转，每一个做父母的人至少应该知道有这么一种观念存在，前面就是"说法不同"的意思。' },
+      { tag: '排除C、D', text: 'C<span class="kw">"悬而未决"</span>和D<span class="kw">"由来已久"</span>没有"不同"的意思，直接排除。' },
+      { tag: 'A、B对比第一空', text: '剩下A<span class="kw">"可惜"</span>和B<span class="kw">"复杂"</span>。整段话中没有可惜的意思，"复杂"更合适——我们一方面渴望独立自主另一方面需要依靠，这东西本身很复杂。' },
+      { tag: '第三空验证 ✅', text: '"这两种相互___的观念存在"——B<span class="kw">"龃龉"</span>——互相矛盾、不一致，两种观念体系之间存在分歧、龃，完全可以。<span class="kw">选B</span>（复杂／莫衷一是／龃）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '今天，很多昆曲工作者在探索昆曲的发展之路，有结合流行元素的，有挖掘新题材的，有<span class="blank">①</span>现代科技的。而我们则着力推动昆曲文化的复原和传承，力求让观众获得<span class="blank">②</span>的昆曲观剧体验。',
+    options: [
+      { label: 'A', words: ['展现', '无与伦比'] },
+      { label: 'B', words: ['融入', '原汁原味'], correct: true },
+      { label: 'C', words: ['混合', '妙趣横生'] },
+      { label: 'D', words: ['运用', '身临其境'] }
+    ],
+    analysis: [
+      { tag: '第一空·通读', text: '"有结合流行元素的，有挖掘新题材的，有___现代科技的"——结合、挖掘、___，三个并列，都是动词+。' },
+      { tag: '排除A', text: '<span class="kw">"展现"</span>——不是展现现代科技，而是需要结合的意思，不对，排除。' },
+      { tag: 'B·先留着', text: '<span class="kw">"融入"</span>——融入现代科技，可以的，先留着。' },
+      { tag: 'C·也留着', text: '<span class="kw">"混合"</span>——混合现代科技的，反正不太好，但先放到这儿。' },
+      { tag: 'D·也留着', text: '<span class="kw">"运用"</span>——运用也可以，先留着。' },
+      { tag: '第二空·解题点', text: '"着力推动昆曲文化的复原和传承，力求让观众获得___的昆曲观剧体验"——关键词是<span class="kw">"复原"</span>。' },
+      { tag: '锁定B ✅', text: 'B<span class="kw">"原汁原味"</span>——复原就是原汁原味嘛，最能体现这个语境。A"无与伦比"没体现复原；C"妙趣横生"没体现；D"身临其境"也没体现复原。<span class="kw">选B</span>（融入／原汁原味）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '风靡一时的Citywalk、旅拍、实景剧本杀等强调"体验感"的游览项目，某种程度上都可以被视作广义上的"沉浸式旅行"。"沉浸式+"无疑是文旅行业的下一个风口，但同样需要提示的是，真正的"沉浸"不只是感官的刺激，同时也依托于内心的<span class="blank">①</span>。形式上打破"第四堵墙"是容易的，而真正捕捉到能抓住游客心的内容逻辑和文化内核，仍然需要<span class="blank">②</span>，不断摸索。',
+    options: [
+      { label: 'A', words: ['吸引', '量体裁衣'] },
+      { label: 'B', words: ['触动', '因地制宜'], correct: true },
+      { label: 'C', words: ['感悟', '对症下药'] },
+      { label: 'D', words: ['悸动', '因势利导'] }
+    ],
+    analysis: [
+      { tag: '第一空·解题点', text: '"真正的沉浸不只是感官的刺激，同时也依托于内心的___"——"感官的刺激"和"内心的___"形成对应关系，刺激对应<span class="kw">触动</span>。' },
+      { tag: '排除A', text: '<span class="kw">"吸引"</span>——没有那种刺激的感觉，动作感不够，排除。' },
+      { tag: '排除C', text: '<span class="kw">"感悟"</span>——也不太合理，感悟更多是理解层面，不是被刺激触动，排除。' },
+      { tag: '排除D', text: '<span class="kw">"悸动"</span>——悸动一般指紧张、心动之类的，题干里没有这个意思，不对，排除。' },
+      { tag: '第二空验证 ✅', text: '"仍然需要___，不断摸索"——B<span class="kw">"因地制宜"</span>——根据不同地方不同情况来摸索，放到这没有错误。<span class="kw">选B</span>（触动／因地制宜）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '作风建设无小事，廉洁自律的考验往往藏在"生活圈""社交圈"的细微处。年轻干部必须以"<span class="blank">①</span>"的清醒系紧"风纪扣"，在公私界限上<span class="blank">②</span>，在校准坐标中涵养浩然之气。一些年轻干部的案例警示我们，许多违纪违法行为的<span class="blank">③</span>，正是对"微特权""小官僚"习以为常的麻木。',
+    options: [
+      { label: 'A', words: ['常备不懈', '一丝不苟', '征兆'] },
+      { label: 'B', words: ['如履薄冰', '寸步不让', '起点'], correct: true },
+      { label: 'C', words: ['严阵以待', '锱铢必较', '端倪'] },
+      { label: 'D', words: ['谨小慎微', '壁垒分明', '倾向'] }
+    ],
+    analysis: [
+      { tag: '第一空·语境', text: '"细微处是个<span class="kw">点</span>"——考验藏在细微处，所以需要的是"谨慎小心"的态度。' },
+      { tag: '排除C', text: '<span class="kw">"严阵以待"</span>——这四个字都不太符合这个语境，严阵以待是摆好阵势等着敌人，排除。' },
+      { tag: '保留ABD', text: '<span class="kw">"常备不懈"</span>（经常准备不懈怠）可以；<span class="kw">"如履薄冰"</span>（谨慎小心像踩在冰上）可以；<span class="kw">"谨小慎微"</span>（"小"对应细微处）可以，先都留下。' },
+      { tag: '第二空·解题点', text: '"在公私界限上一定是<span class="kw">分明</span>的意思"——公私要分开，界限要清楚。' },
+      { tag: '排除A', text: '<span class="kw">"一丝不苟"</span>——认真的意思，但和"界限分明"没关系，不太符合，排除。' },
+      { tag: '排除D', text: '<span class="kw">"壁垒分明"</span>——壁垒是防御工事，题干跟壁垒没有关系，排除。' },
+      { tag: '锁定B ✅', text: 'B<span class="kw">"寸步不让"</span>——在公私界限上一步都不让，符合"分明"的意思。' },
+      { tag: '第三空验证 ✅', text: '"许多违纪违法行为的___"——B"起点"：这些行为就是从对微特权习以为常开始的。<span class="kw">选B</span>（如履薄冰／寸步不让／起点）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '"不谋万世者，不足谋一时；不谋全局者，不足谋一域。"这是存在于中国人性格中的大局观。围棋也与大局观<span class="blank">①</span>。下围棋一定要<span class="blank">②</span>全局，围棋博弈是一系列战役战斗相连、组合而成的一场全局性博弈。全局利益高于一切，棋理也说"急所重于大场"。',
+    options: [
+      { label: 'A', words: ['息息相关', '照应'], correct: true },
+      { label: 'B', words: ['一脉相承', '反映'] },
+      { label: 'C', words: ['互为表里', '掌控'] },
+      { label: 'D', words: ['水乳交融', '谋划'] }
+    ],
+    analysis: [
+      { tag: '第一空·排除D', text: '<span class="kw">"水乳交融"</span>——交融到一块了，围棋和大局观不太符合这个意思，排除。' },
+      { tag: '排除B', text: '<span class="kw">"一脉相承"</span>——"脉"是脉络，一脉相承形容的是从同一个脉络下承下来的。围棋和大局观是两种东西，不可能一脉相承，排除。' },
+      { tag: '排除C', text: '<span class="kw">"互为表里"</span>——一个是表一个是里，题干没有说什么是表什么是里，排除。' },
+      { tag: '锁定A ✅', text: 'A<span class="kw">"息息相关"</span>——围棋与大局观是有关系的。<span class="kw">选A</span>。' },
+      { tag: '第二空验证 ✅', text: '"下围棋一定要___全局"——A"照应全局"：下围棋一定要照应全局，看全局嘛，符合。<span class="kw">选A</span>（息息相关／照应）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 双空',
+    text: '复盘一些网暴事件不难发现，绝大多数攻击都是基于一种道德判断，尽管这种道德判断是盲目的、偏激的，但施暴者却<span class="blank">①</span>，将这种道德判断强加在受害者身上。面对网暴，任何试图摆事实、讲道理的努力都<span class="blank">②</span>，反倒是为他们提供了更多"情绪劳动"的线索和资源。',
+    options: [
+      { label: 'A', words: ['自欺欺人', '徒劳无功'] },
+      { label: 'B', words: ['自以为是', '无济于事'], correct: true },
+      { label: 'C', words: ['不以为然', '百无一用'] },
+      { label: 'D', words: ['不辨真伪', '于事无补'] }
+    ],
+    analysis: [
+      { tag: '第一空·排除D', text: '题干里并没有<span class="kw">真伪、对错</span>的真假退出表述，所以"不辨真伪"不对，排除。' },
+      { tag: '排除C', text: '<span class="kw">"不以为然"</span>——不认为这样是对的，那就和题目所说的意思违背了（施暴者是认为自己对才强加给别人），排除。' },
+      { tag: '排除A', text: '<span class="kw">"自欺欺人"</span>——自己欺骗自己，题干并没有表达"明明知道是对的、明明知道是伤害你的，但假装不知道继续伤害你"的意思，排除。' },
+      { tag: '锁定B ✅', text: 'B<span class="kw">"自以为是"</span>——自己认为这是对的，很多网络施暴者就是"我认为是这样就是这样，所以你不这样我就批判你"。' },
+      { tag: '第二空验证 ✅', text: '"任何试图摆事实讲道理的努力都___"——B<span class="kw">"无济于事"</span>：没用，反倒是给他们提供了更多情绪劳动。<span class="kw">选B</span>（自以为是／无济于事）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 三空',
+    text: '欣赏现场古典音乐表演时，往往有以下<span class="blank">①</span>的规矩：手机调成静音，安静就座，保持肃静，<span class="blank">②</span>地聆听，等一首作品表演完毕才鼓掌……然而，这些看似<span class="blank">③</span>的欣赏古典音乐表演的方式只是现代社会的独有现象，在这些音乐作品诞生的那个年代，欣赏方式并非如此。',
+    options: [
+      { label: 'A', words: ['一丝不苟', '心无旁骛', '规范'] },
+      { label: 'B', words: ['郑重其事', '正襟危坐', '科学'] },
+      { label: 'C', words: ['众所周知', '目不转睛', '标准'] },
+      { label: 'D', words: ['约定俗成', '全神贯注', '正确'], correct: true }
+    ],
+    analysis: [
+      { tag: '第一空·解题点', text: '"<span class="kw">往往</span>"是什么意思？就经常、一直都是这样。看ABCD，只有D<span class="kw">"约定俗成"</span>有"之前就有、一直这样"的意思，所以大概率把答案锁在D。' },
+      { tag: '第二空验证 ✅', text: '"___地聆听"——D<span class="kw">"全神贯注"</span>：手机调成静音、安静肃静，那可不得认真的、全神贯注地聆听吗？符合。' },
+      { tag: '第三空验证 ✅', text: '"这些看似___的欣赏方式"——D<span class="kw">"正确"</span>：看似正确的欣赏方式，只是现代社会的独有现象，以前并非如此。<span class="kw">选D</span>（约定俗成／全神贯注／正确）。' }
+    ]
+  },
+  {
+    tag: '逻辑填空 · 单空',
+    text: '户外不等于"野外"，运动不等于"盲动"。我们固然不能因为安全风险就<span class="blank">①</span>，但户外运动也要做好事前防范，注意风险管控。',
+    options: [
+      { label: 'A', words: ['深居简出'] },
+      { label: 'B', words: ['投鼠忌器'] },
+      { label: 'C', words: ['因噎废食'], correct: true },
+      { label: 'D', words: ['委曲求全'] }
+    ],
+    analysis: [
+      { tag: '语境分析', text: '"不能因为安全风险就___"——意思是<span class="kw">不能因为怕有风险就不去做</span>，不能太过。' },
+      { tag: '排除A', text: '<span class="kw">"深居简出"</span>——题干里没提到"深"和"简"的意思，排除。' },
+      { tag: '排除B', text: '<span class="kw">"投鼠忌器"</span>——投是扔东西打老鼠，害怕打坏旁边的容器。题干没有表达这个意思，排除。' },
+      { tag: '锁定C ✅', text: 'C<span class="kw">"因噎废食"</span>——害怕噎到就不吃食物了，完美对应"不能因为安全风险就不做运动"。<span class="kw">选C</span>。' },
+      { tag: '排除D验证', text: '<span class="kw">"委曲求全"</span>——委屈自己来求一个完全，这里没有"全"的意思，排除。' }
+    ]
+  }
+];
+
+let currentQ = 0, score = 0, streak = 0, answered = false;
+let reviewMode = false; // 是否在查看已答题（非做题模式）
+
+function renderQuestion() {
+  const origIdx = activeList[currentQ];
+  const q = questions[origIdx];
+  const isReview = reviewMode || (completedSet[origIdx] !== undefined && currentMode === 'all');
+  answered = isReview;
+
+  const area = document.getElementById('quizArea');
+  const correctIdx = q.options.findIndex(o => o.correct);
+  const wasCorrect = completedSet[origIdx] === true;
+
+  area.innerHTML = `
+    <div class="card">
+      <div class="question-tag">${q.tag}${isReview ? (wasCorrect ? ' ✅' : ' ❌') : ''}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options">
+        ${q.options.map((opt,i)=>{
+          let cls = 'option';
+          if(isReview) {
+            cls += ' disabled';
+            if(opt.correct) cls += ' correct';
+          }
+          return `
+          <div class="${cls}" data-index="${i}" onclick="${isReview ? '' : 'selectOption('+i+')'}">
+            <span class="option-label">${opt.label}</span>
+            <div class="option-words">
+              ${opt.words.map(w=>`<span class="word-chip">${w}</span>`).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${isReview ? '' : '<button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>提交答案</button>'}
+      <div class="feedback ${isReview ? (wasCorrect ? 'correct-fb show' : 'wrong-fb show') : ''}" id="feedback" ${isReview ? '' : 'style="display:none"'}>
+        ${isReview ? `<div class="feedback-emoji">${wasCorrect ? '🎉' : '🌱'}</div><div class="feedback-title">${wasCorrect ? '答对了' : '答错了'}</div><div class="feedback-msg">正确答案：${q.options[correctIdx].label}</div>` : ''}
+      </div>
+      <div class="analysis ${isReview ? 'show' : ''}" id="analysis">
+        <div class="analysis-title">🔍 语境呼应法拆解</div>
+        ${q.analysis.map(a=>`<div class="analysis-step"><span class="step-tag">${a.tag}</span>${a.text}</div>`).join('')}
+      </div>
+      ${isReview ? `
+        <div class="action-bar">
+          <button class="btn btn-review" onclick="redoOne(${origIdx})">🔄 重做此题</button>
+          ${currentQ > 0 ? '<button class="btn btn-ghost" onclick="prevQuestion()">← 上一题</button>' : ''}
+          ${currentQ < activeList.length - 1 ? '<button class="btn btn-primary" onclick="nextQuestion()">下一题 →</button>' : ''}
+        </div>
+      ` : `
+        <div class="action-bar">
+          ${currentQ > 0 ? '<button class="btn btn-ghost" onclick="prevQuestion()">← 上一题</button>' : ''}
+          <button class="btn btn-next" id="nextBtn" style="display:none" onclick="nextQuestion()">${currentQ < activeList.length - 1 ? '下一题 →' : '查看结果 🎯'}</button>
+        </div>
+      `}
+    </div>
+  `;
+  updateProgress();
+  renderNavStrip();
+}
+
+function selectOption(i) {
+  if(answered) return;
+  document.querySelectorAll('.option').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('.option')[i].classList.add('selected');
+  document.getElementById('submitBtn').disabled = false;
+}
+
+function submitAnswer() {
+  if(answered) return;
+  answered = true;
+  const sel = document.querySelector('.option.selected');
+  const idx = parseInt(sel.dataset.index);
+  const origIdx = activeList[currentQ];
+  const q = questions[origIdx];
+  const correct = q.options[idx].correct;
+
+  document.querySelectorAll('.option').forEach((el,i)=>{
+    el.classList.add('disabled');
+    if(q.options[i].correct) el.classList.add('correct');
+    if(i===idx && !correct) el.classList.add('wrong');
+  });
+
+  const fb = document.getElementById('feedback');
+  const analysis = document.getElementById('analysis');
+  const nextBtn = document.getElementById('nextBtn');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if(correct) {
+    score++;
+    streak++;
+    const earned = 5;
+    points += earned;
+    const msg = correctMsgs[Math.floor(Math.random()*correctMsgs.length)];
+    fb.className = 'feedback correct-fb show';
+    fb.innerHTML = `
+      <div class="feedback-emoji">${msg.emoji}</div>
+      <div class="feedback-title">${msg.title}</div>
+      <div class="feedback-msg">${msg.msg}</div>
+      <div class="feedback-points">+${earned} 积分</div>
+    `;
+    flyPoints(earned);
+  } else {
+    streak = 0;
+    const msg = wrongMsgs[Math.floor(Math.random()*wrongMsgs.length)];
+    fb.className = 'feedback wrong-fb show';
+    fb.innerHTML = `
+      <div class="feedback-emoji">${msg.emoji}</div>
+      <div class="feedback-title">${msg.title}</div>
+      <div class="feedback-msg">${msg.msg}</div>
+    `;
+  }
+
+  analysis.classList.add('show');
+  submitBtn.classList.add('hidden');
+  if(nextBtn) nextBtn.style.display = 'block';
+
+  // 保存进度
+  if (correct) {
+    completedSet[origIdx] = true;
+    wrongList = wrongList.filter(i => i !== origIdx);
+  } else {
+    if (!wrongList.includes(origIdx)) wrongList.push(origIdx);
+  }
+  saveProgress();
+  updateStats();
+  updateTopbar();
+}
+
+function flyPoints(earned) {
+  const el = document.createElement('div');
+  el.className = 'points-fly';
+  el.textContent = `+${earned} ⭐`;
+  const rect = document.querySelector('.points').getBoundingClientRect();
+  el.style.left = (rect.left + rect.width/2 - 30) + 'px';
+  el.style.top = (rect.top + 20) + 'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1000);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if(currentQ < activeList.length) renderQuestion();
+  else showResult();
+}
+
+function prevQuestion() {
+  if(currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+function renderNavStrip() {
+  const strip = document.getElementById('navStrip');
+  if (!strip) return;
+  const qs = getCurrentQuestions();
+  let html = '';
+  for (let i = 0; i < qs.length; i++) {
+    let cls = 'nav-dot';
+    if (completedSet[i] === true) cls += ' done';
+    else if (wrongList.includes(i)) cls += ' wrong';
+    if (activeList[currentQ] === i) cls += ' current';
+    html += `<div class="${cls}" data-idx="${i}" onclick="jumpToQuestion(${i})">${i + 1}</div>`;
+  }
+  strip.innerHTML = html;
+  // 自动滚动到当前题目
+  requestAnimationFrame(() => {
+    const cur = strip.querySelector('.nav-dot.current');
+    if (cur) cur.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  });
+}
+
+function jumpToQuestion(origIdx) {
+  const qs = getCurrentQuestions();
+  const pos = activeList.indexOf(origIdx);
+  if (pos === -1) {
+    // 不在当前列表，切换到全部题目模式
+    currentMode = 'all';
+    document.getElementById('btnNew').classList.add('active');
+    document.getElementById('btnWrong').classList.remove('active');
+    activeList = [];
+    for (let i = 0; i < qs.length; i++) activeList.push(i);
+    currentQ = origIdx;
+  } else {
+    currentQ = pos;
+  }
+  reviewMode = false;
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  document.querySelector('.progress-wrap').classList.remove('hidden');
+  document.querySelector('.hero').classList.remove('hidden');
+  renderQuestion();
+}
+
+function redoOne(origIdx) {
+  delete completedSet[origIdx];
+  wrongList = wrongList.filter(i => i !== origIdx);
+  saveProgress();
+  reviewMode = false;
+  currentMode = 'all';
+  const qs = getCurrentQuestions();
+  activeList = [];
+  for (let i = 0; i < qs.length; i++) activeList.push(i);
+  currentQ = origIdx;
+  updateStats();
+  renderQuestion();
+}
+
+function redoAll() {
+  if (confirm('确定要重做当前模块全部题目吗？这会清除该模块所有做题记录。')) {
+    completedSet = {};
+    wrongList = [];
+    saveProgress();
+    currentMode = 'all';
+    reviewMode = false;
+    startSession();
+  }
+}
+
+function showResult() {
+  const totalThisRound = activeList.length;
+  const pct = Math.round(score/totalThisRound*100);
+  let emoji, title, subtitle;
+  if(pct === 100) {
+    emoji = '🏆'; title = '全部答对！'; subtitle = '你的语境呼应法已经炉火纯青了！';
+  } else if(pct >= 67) {
+    emoji = '🌟'; title = '做得不错！'; subtitle = '方法已经入门了，继续练习会更强。';
+  } else {
+    emoji = '🌱'; title = '还需要练习'; subtitle = '看看解析，理解方法后再来一轮。';
+  }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSubtitle').textContent = subtitle;
+  document.getElementById('resultScore').textContent = pct + '%';
+  document.getElementById('correctCount').textContent = score;
+  document.getElementById('wrongCount').textContent = totalThisRound - score;
+  document.getElementById('totalPoints').textContent = points;
+
+  document.getElementById('quizArea').classList.add('hidden');
+  document.querySelector('.progress-wrap').classList.add('hidden');
+  document.querySelector('.hero').classList.add('hidden');
+  const r = document.getElementById('resultArea');
+  r.classList.remove('hidden');
+
+  updateStats();
+
+  // 本轮结束后检查是否全部完成
+  const remaining = getCurrentQuestions().length - getCompletedCount();
+  if (remaining === 0 && wrongList.length === 0) {
+    setTimeout(() => {
+      r.classList.add('hidden');
+      showCompleteView();
+    }, 3000);
+  }
+}
+
+function restart() {
+  document.getElementById('completeView').classList.add('hidden');
+  document.getElementById('resultArea').classList.add('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  document.querySelector('.progress-wrap').classList.remove('hidden');
+  document.querySelector('.hero').classList.remove('hidden');
+  reviewMode = false;
+  startSession();
+}
+
+function updateProgress() {
+  const total = activeList.length;
+  if (total === 0) {
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressText').textContent = '0/0';
+    return;
+  }
+  const pct = (currentQ/total)*100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${currentQ+1}/${total}`;
+}
+
+function updateTopbar() {
+  document.getElementById('pointsDisplay').textContent = points;
+  document.getElementById('streakDisplay').textContent = streak;
+}
+
+// 初始化
+renderModuleTabs();
+loadProgress();
+updateStats();
+updateTopbar();
+startSession();
+</script>
+</body>
+</html>
